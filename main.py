@@ -2,6 +2,12 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
+import pandas
+
+
+excel_file = pandas.read_excel("wine.xlsx")
+wines = excel_file.to_dict("records")
+print(wines)
 
 
 def get_years(years):
