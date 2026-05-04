@@ -7,7 +7,7 @@ import pandas
 
 excel_file = pandas.read_excel("wine.xlsx")
 wines = excel_file.to_dict("records")
-print(wines)
+# print(wines)
 
 
 def get_years(years):
@@ -37,6 +37,7 @@ rendered_page = template.render(
     # cap2_text="$ 120.00",
     # cap3_title="Ещё одна чёрная кепка",
     # cap3_text="$ 90.00",
+    wines=wines,
     current_year=datetime.now().year,
     get_years=get_years,
 )
