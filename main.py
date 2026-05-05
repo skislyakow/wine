@@ -1,13 +1,26 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
+from pprint import pprint
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import pandas
 
 
 excel_file = pandas.read_excel("wine.xlsx")
+wine2_file = pandas.read_excel("wine2.xlsx", keep_default_na=False)
+wine2_file = wine2_file.replace("NaN", "")
+wine2_file = wine2_file.fillna("")
+wine_dict = {}
+grouped = wine2_file.groupby("Категория")
+for category, group in grouped:
+    wines_in_category = group.to_dict("records")
+    wine_dict[category] = wines_in_category
+
+
 wines = excel_file.to_dict("records")
 # print(wines)
+print("Итоговая структура продукции:")
+pprint(wine_dict)
 
 
 def get_years(years):
