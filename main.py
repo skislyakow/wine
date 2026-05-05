@@ -1,31 +1,19 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
-from pprint import pprint
 from collections import defaultdict
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import pandas
 
 
-excel_file = pandas.read_excel("wine.xlsx")
-wine2_file = pandas.read_excel("wine2.xlsx", keep_default_na=False)
-wine2_file = wine2_file.replace("NaN", "")
-wine2_file = wine2_file.fillna("")
+wine_data = pandas.read_excel("wine2.xlsx", keep_default_na=False)
+wine_data = wine_data.replace("NaN", "")
+wine_data = wine_data.fillna("")
 wine_dict = defaultdict(list)
-# grouped = wine2_file.groupby("Категория")
-# for category, group in grouped:
-#    wines_in_category = group.to_dict("records")
-#    wine_dict[category] = wines_in_category
 
-for index, row in wine2_file.iterrows():
+for index, row in wine_data.iterrows():
     wine_item = row.to_dict()
     wine_dict[row["Категория"]].append(wine_item)
-
-
-wines = excel_file.to_dict("records")
-# print(wines)
-# print("Итоговая структура продукции:")
-pprint(wine_dict)
 
 
 def get_years(years):
@@ -55,7 +43,7 @@ rendered_page = template.render(
     # cap2_text="$ 120.00",
     # cap3_title="Ещё одна чёрная кепка",
     # cap3_text="$ 90.00",
-    wines=wines,
+    wines=dict(wine_dict),
     current_year=datetime.now().year,
     get_years=get_years,
 )
