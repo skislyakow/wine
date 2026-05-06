@@ -6,7 +6,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import pandas
 
 
-wine_data = pandas.read_excel("wine2.xlsx", keep_default_na=False)
+wine_data = pandas.read_excel("wine.xlsx", keep_default_na=False)
 wine_data = wine_data.replace("NaN", "")
 wine_data = wine_data.fillna("")
 wine_dict = defaultdict(list)
@@ -37,12 +37,6 @@ env = Environment(
 template = env.get_template("template.html")
 
 rendered_page = template.render(
-    # cap1_title="Красная кепка",
-    # cap1_text="$ 100.00",
-    # cap2_title="Чёрная кепка",
-    # cap2_text="$ 120.00",
-    # cap3_title="Ещё одна чёрная кепка",
-    # cap3_text="$ 90.00",
     wines=dict(wine_dict),
     current_year=datetime.now().year,
     get_years=get_years,
