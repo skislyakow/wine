@@ -1,19 +1,10 @@
+import argparse
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from datetime import datetime
 from collections import defaultdict
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import pandas
-
-
-wine_data = pandas.read_excel("wine.xlsx", keep_default_na=False)
-wine_data = wine_data.replace("NaN", "")
-wine_data = wine_data.fillna("")
-wine_dict = defaultdict(list)
-
-for index, row in wine_data.iterrows():
-    wine_item = row.to_dict()
-    wine_dict[row["Категория"]].append(wine_item)
 
 
 def get_years(years):
@@ -30,20 +21,43 @@ def get_years(years):
     return "лет"
 
 
-env = Environment(
-    loader=FileSystemLoader("."), autoescape=select_autoescape(["html", "xml"])
-)
+def main():
+    parser = argparse.ArgumentParser(description="Wine site")
+    parser.add_argument(
+        "--excel",
+        default="wine.xlsx",
+        help="Path to the Excel file with wine data (default: wine.xlsx)",
+    )
+    args = parser.parse_args()
 
-template = env.get_template("template.html")
+    wine_data = pandas.read_excel(args.excel, keep_default_na=False)
+    wine_data = wine_data.replace("NaN", "")
+    wine_data = wine_data.fillna("")
+    wine_dict = defaultdict(list)
 
-rendered_page = template.render(
-    wines=dict(wine_dict),
-    current_year=datetime.now().year,
-    get_years=get_years,
-)
+    for index, row in wine_data.iterrows():
+        wine_item = row.to_dict()
+        wine_dict[row["Категория"]].append(wine_item)
 
-with open("index.html", "w", encoding="utf8") as file:
-    file.write(rendered_page)
+    env = Environment(
+        loader=FileSystemLoader("."),
+        autoescape=select_autoescape(["html", "xml"]),
+    )
 
-server = HTTPServer(("0.0.0.0", 8000), SimpleHTTPRequestHandler)
-server.serve_forever()
+    template = env.get_template("template.html")
+
+    rendered_page = template.render(
+        wines=wine_dict,
+        current_year=datetime.now().year,
+        get_years=get_years,
+    )
+
+    with open("index.html", "w", encoding="utf8") as file:
+        file.write(rendered_page)
+
+    server = HTTPServer(("0.0.0.0", 8000), SimpleHTTPRequestHandler)
+    server.serve_forever()
+
+
+if __name__ == "__main__":
+    main()
